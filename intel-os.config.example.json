@@ -1,0 +1,6 @@
+{
+  "vaultRoot": "D:\\IntelOS\\vault",
+  "wikiRoot": "D:\\IntelOS\\vault\\wiki",
+  "intelRoot": "D:\\IntelOS\\intelligence",
+  "excludedSegments": ["private"]
+}

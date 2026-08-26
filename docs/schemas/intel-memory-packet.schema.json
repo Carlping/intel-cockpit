@@ -1,0 +1,233 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.intel-os.invalid/schemas/intel-memory-packet.schema.json",
+  "title": "IntelOS Cognitive Memory Packet",
+  "description": "A derived, portable reading and index snapshot. Canonical Markdown entities remain the source of truth.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "provenance",
+    "id",
+    "type",
+    "title",
+    "as_of",
+    "reading_depth",
+    "status",
+    "summary_30s",
+    "architecture_3m",
+    "evidence_10m",
+    "decision_25m",
+    "deep_dive_50m",
+    "memory",
+    "tags",
+    "source_refs",
+    "index_text"
+  ],
+  "properties": {
+    "schema_version": { "const": "intel-memory-packet/1" },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "source_system", "source_revision", "canonical_truth"],
+      "properties": {
+        "kind": { "const": "derived_snapshot" },
+        "source_system": { "const": "IntelOS" },
+        "source_revision": { "type": ["string", "number", "null"] },
+        "canonical_truth": { "type": "string", "minLength": 1 }
+      }
+    },
+    "id": { "type": "string", "pattern": "^brief-[a-zA-Z0-9_\\-\\p{L}]+$" },
+    "type": { "const": "cognitive_brief" },
+    "title": { "type": "string", "minLength": 1 },
+    "as_of": { "type": "string", "minLength": 1 },
+    "reading_depth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "task"],
+      "properties": {
+        "id": { "enum": ["scan", "map", "understand", "decide", "deep"] },
+        "label": { "enum": ["30 秒", "3 分鐘", "10 分鐘", "25 分鐘", "50 分鐘"] },
+        "task": { "enum": ["定位", "架構", "建模", "判斷", "內化"] }
+      }
+    },
+    "status": { "type": "string", "minLength": 1 },
+    "summary_30s": { "$ref": "#/$defs/orientation" },
+    "architecture_3m": { "$ref": "#/$defs/architecture" },
+    "evidence_10m": { "$ref": "#/$defs/evidenceModel" },
+    "decision_25m": { "$ref": "#/$defs/decision" },
+    "deep_dive_50m": { "$ref": "#/$defs/deepDive" },
+    "memory": { "$ref": "#/$defs/memory" },
+    "tags": {
+      "type": "array",
+      "maxItems": 12,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "source_refs": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/sourceRef" }
+    },
+    "index_text": { "type": "string", "minLength": 1 }
+  },
+  "$defs": {
+    "orientation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "headline", "significance", "nextAction", "uncertainty"],
+      "properties": {
+        "state": { "type": "string", "minLength": 1 },
+        "headline": { "type": "string", "minLength": 1 },
+        "significance": { "type": "string", "minLength": 1 },
+        "nextAction": { "type": "string", "minLength": 1 },
+        "uncertainty": { "type": "string", "minLength": 1 }
+      }
+    },
+    "architecture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["question", "before", "now", "impact", "nodes"],
+      "properties": {
+        "question": { "type": "string", "minLength": 1 },
+        "before": { "type": "string", "minLength": 1 },
+        "now": { "type": "string", "minLength": 1 },
+        "impact": { "type": "string", "minLength": 1 },
+        "nodes": {
+          "type": "array",
+          "maxItems": 5,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "text", "status", "asOf"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "kind": { "enum": ["known", "inference", "unknown", "contradiction"] },
+        "text": { "type": "string", "minLength": 1 },
+        "status": { "type": "string" },
+        "asOf": { "type": "string" },
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["label", "href"],
+          "properties": {
+            "label": { "type": "string", "minLength": 1 },
+            "href": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
+    "evidenceModel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["assessment", "confidence", "evidence", "knownCount", "inferenceCount", "unknownCount", "contradictionCount"],
+      "properties": {
+        "assessment": { "type": "string", "minLength": 1 },
+        "confidence": { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/evidence" } },
+        "knownCount": { "type": "integer", "minimum": 0 },
+        "inferenceCount": { "type": "integer", "minimum": 0 },
+        "unknownCount": { "type": "integer", "minimum": 0 },
+        "contradictionCount": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "mission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "objective", "nextAction", "doneCondition", "stopCondition", "reviewDate", "status"],
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string", "minLength": 1 },
+        "objective": { "type": "string" },
+        "nextAction": { "type": "string", "minLength": 1 },
+        "doneCondition": { "type": "string" },
+        "stopCondition": { "type": "string" },
+        "reviewDate": { "type": "string" },
+        "status": { "type": "string", "minLength": 1 }
+      }
+    },
+    "scenario": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "probability", "summary", "trigger", "implication", "invalidation"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "label": { "type": "string", "minLength": 1 },
+        "probability": { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
+        "summary": { "type": "string" },
+        "trigger": { "type": "string" },
+        "implication": { "type": "string" },
+        "invalidation": { "type": "string" }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["missions", "scenarios", "watchCondition", "stopCondition", "reopenCondition", "nextReview"],
+      "properties": {
+        "missions": { "type": "array", "items": { "$ref": "#/$defs/mission" } },
+        "scenarios": { "type": "array", "items": { "$ref": "#/$defs/scenario" } },
+        "watchCondition": { "type": "string" },
+        "stopCondition": { "type": "string" },
+        "reopenCondition": { "type": "string" },
+        "nextReview": { "type": "string" }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "href"],
+      "properties": {
+        "label": { "type": "string", "minLength": 1 },
+        "href": { "type": "string", "minLength": 1 },
+        "status": { "type": "string" }
+      }
+    },
+    "deepDive": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["transcript", "sources", "briefingStatus", "duration"],
+      "properties": {
+        "transcript": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "sources": { "type": "array", "items": { "$ref": "#/$defs/source" } },
+        "briefingStatus": { "type": "string" },
+        "duration": { "type": "string" }
+      }
+    },
+    "retrievalCue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["prompt", "answer"],
+      "properties": {
+        "prompt": { "type": "string", "minLength": 1 },
+        "answer": { "type": "string", "minLength": 1 }
+      }
+    },
+    "memory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claims", "openQuestions", "retrievalCues", "tags"],
+      "properties": {
+        "claims": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "openQuestions": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "retrievalCues": { "type": "array", "minItems": 2, "items": { "$ref": "#/$defs/retrievalCue" } },
+        "tags": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "sourceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "uri", "status"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "title": { "type": "string", "minLength": 1 },
+        "uri": { "type": "string", "minLength": 1 },
+        "status": { "type": ["string", "null"] }
+      }
+    }
+  }
+}
