@@ -38,6 +38,10 @@ charts — they are the constraints:
   implementation reports and acceptance evidence that the work was executed against —
   including the threat model that documents what is *not* solved.
 
+How the work was actually directed — the acceptance criteria, the non-goals list, and the
+three things review caught before they shipped — is written up in
+[`docs/CASE_STUDY.md`](docs/CASE_STUDY.md).
+
 ## Architecture at a glance
 
 ```text
